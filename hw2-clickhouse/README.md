@@ -4,8 +4,7 @@
 
 ## 🏗️ Архитектура
 
- CSV-файл     ────▶ Kafka    ────▶ ClickHouse  
- (producer)         (топик)         (таблица)   
+ CSV-файл ▶ Kafka  ▶ ClickHouse  
 
 
 Компоненты:
@@ -36,36 +35,47 @@
 git clone https://github.com/kmurza/mlops-course-hw.git
 cd mlops-course-hw/hw2-clickhouse
 docker-compose up --build -d
+```
 
-Проверка
-1. Проверь, что все контейнеры запущены:
+Подожди 1–2 минуты, пока контейнеры поднимутся.
 
-bash
+### Проверка
+
+**1. Проверь, что все контейнеры запущены:**
+
+```bash
 docker ps
-Должны быть: zookeeper, kafka (healthy), kafka-setup (Exited 0), clickhouse, producer.
+```
 
-2. Проверь, что данные попали в ClickHouse:
+Должны быть: `zookeeper`, `kafka` (healthy), `kafka-setup` (Exited 0), `clickhouse`, `producer`.
 
-bash
+**2. Проверь, что данные попали в ClickHouse:**
+
+```bash
 docker exec -it hw2-clickhouse-clickhouse-1 clickhouse-client \
   --query "SELECT COUNT(*) FROM fraud_db.transactions"
-Должно быть 50 000.
+```
 
-3. Посмотри первые строки:
+Должно быть **50 000**.
 
-bash
+**3. Посмотри первые строки:**
+
+```bash
 docker exec -it hw2-clickhouse-clickhouse-1 clickhouse-client \
   --query "SELECT * FROM fraud_db.transactions LIMIT 5"
+```
 
+## 📊 SQL-запросы (пункт 3)
 
-📊 SQL-запросы (пункт 3)
-Задача: категория наибольшей транзакции по каждому штату.
+Задача: **категория наибольшей транзакции по каждому штату**.
 
-Формулировка допускает два толкования, поэтому реализованы оба:
+Формулировка допускает два толкования, поэтому реализовала оба.
 
-Вариант А — категория с максимальной суммой транзакций (queries/top_category_by_state_sum.sql):
+### Первый вариант — категория с максимальной суммой транзакций
 
-sql
+Файл: `queries/top_category_by_state_sum.sql`
+
+```sql
 SELECT
     us_state,
     cat_id,
@@ -74,10 +84,13 @@ FROM fraud_db.transactions
 GROUP BY us_state, cat_id
 ORDER BY us_state, total_amount DESC
 LIMIT 1 BY us_state;
+```
 
-Вариант Б — категория самой крупной единичной транзакции (queries/top_category_by_state_max.sql):
+### Второй вариант — категория самой крупной единичной транзакции
 
-sql
+Файл: `queries/top_category_by_state_max.sql`
+
+```sql
 SELECT
     us_state,
     cat_id,
@@ -85,10 +98,12 @@ SELECT
 FROM fraud_db.transactions
 ORDER BY us_state, amount DESC
 LIMIT 1 BY us_state;
+```
+
 Результаты лежат в:
 
-results/top_category_by_state_sum.csv
+- `results/top_category_by_state_sum.csv`
+- `results/top_category_by_state_max.csv`
 
-results/top_category_by_state_max.csv
+## ⚡ Оптимизация хранения (пункт 4)
 
-⚡ Оптимизация хранения (пункт 4)
