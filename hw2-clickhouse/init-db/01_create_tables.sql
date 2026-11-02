@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS fraud_db.kafka_transactions_stream (
     one_city         String,
     us_state         String,
     population_city  Int32,
-    jobs             String
+    jobs             String,
+    target           UInt8 
 ) ENGINE = Kafka
 SETTINGS
     kafka_broker_list = 'kafka:29092',
@@ -27,7 +28,8 @@ CREATE TABLE IF NOT EXISTS fraud_db.transactions (
     one_city         String,
     us_state         String,
     population_city  Int32,
-    jobs             String
+    jobs             String,
+    target           UInt8 
 ) ENGINE = MergeTree()
 ORDER BY (us_state, cat_id);
 
@@ -44,5 +46,6 @@ SELECT
     one_city,
     us_state,
     population_city,
-    jobs
+    jobs,
+    target 
 FROM fraud_db.kafka_transactions_stream;

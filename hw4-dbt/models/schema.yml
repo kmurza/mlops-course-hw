@@ -1,0 +1,76 @@
+version: 2
+
+models:
+  - name: stg_transactions
+    description: "Очищенные транзакции с сегментацией суммы"
+    columns:
+      - name: transaction_time
+        description: "Время транзакции"
+        tests:
+          - not_null
+      - name: amount
+        description: "Сумма транзакции"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: gender
+        description: "Пол клиента (M - мужской, F - женский)"
+        tests:
+          - accepted_values:
+              values: ['M', 'F']
+
+  - name: mart_fraud_by_category
+    description: "Уровень мошенничества по категориям"
+    columns:
+      - name: cat_id
+        description: "Категория транзакции"
+        tests:
+          - unique
+          - not_null
+      - name: fraud_rate
+        description: "Доля фродовых транзакций в процентах (%)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+
+  - name: mart_fraud_by_state
+    description: "Уровень мошенничества по штатам"
+    columns:
+      - name: us_state
+        description: "Штат США"
+        tests:
+          - unique
+          - not_null
+
+  - name: mart_hourly_fraud_pattern
+    description: "Временные паттерны фрода по дням недели и часам"
+    columns:
+      - name: day_of_week
+        description: "День недели (1-7)"
+        tests:
+          - not_null
+      - name: hour_of_day
+        description: "Час дня (0-23)"
+        tests:
+          - not_null
+      - name: fraud_rate
+        description: "Доля фродовых транзакций, %"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: 0
+                max_value: 100
+
+  - name: mart_daily_state_metrics
+    description: "Дневные метрики по штатам: количество транзакций, суммы, средний чек, P95 и доля крупных транзакций."
+    columns:
+      - name: transaction_date
+        description: "Дата транзакции"
+        tests:
+          - not_null
+      - name: us_state
+        description: "Штат США"
+        tests:
+          - not_null

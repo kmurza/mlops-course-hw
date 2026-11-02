@@ -27,7 +27,7 @@ def main():
     # в Kafka шлём только нужные поля
     keep = [
         "transaction_time", "merch", "cat_id", "amount",
-        "gender", "one_city", "us_state", "population_city", "jobs",
+        "gender", "one_city", "us_state", "population_city", "jobs", "target",
     ]
     df = df[keep]
 
