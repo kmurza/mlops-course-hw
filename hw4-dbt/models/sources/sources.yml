@@ -1,0 +1,6 @@
+version: 2
+sources:
+  - name: fraud_source
+    schema: fraud_db
+    tables:
+      - name: transactions

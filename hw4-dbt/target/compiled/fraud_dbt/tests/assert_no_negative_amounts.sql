@@ -1,0 +1,1 @@
+SELECT * FROM `fraud_db`.`stg_transactions` WHERE amount < 0
